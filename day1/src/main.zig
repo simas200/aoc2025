@@ -17,17 +17,21 @@ pub fn main() !void {
     const opList = try read("input");
     var pos: i32 = 50;
     var res: i32 = 0;
+//    for (opList) |op| {
+//        pos = rotate(pos, op.dir, op.size);
+//        if (pos == 0) {
+//            res += 1;
+//        }
+//    }
+//    pos = 50;
+//    res = 0;
     for (opList) |op| {
-        //if (&op == null ) break;
-        pos = rotate(pos, op.dir, op.size);
-        if (pos == 0) {
-            res += 1;
-        }
+
+        const thing = rotate2(pos, op.dir, op.size);
+        res += thing[0];
+        pos = thing[1];
     }
     std.debug.print("{d}", .{res});
-    //std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    //std.debug.print("{s}", .{try std.fs.cwd()});
-    //try day1.bufferedPrint();
 }
 
 pub fn rotate(curr: i32, dir: Dir, size: i32) i32 {
@@ -35,7 +39,10 @@ pub fn rotate(curr: i32, dir: Dir, size: i32) i32 {
     std.debug.print("Curr: {d}, dir: {s}, size: {d}\n", .{curr, @tagName(dir), size});
     switch (dir) {
         Dir.left => {
-            temp = @rem((curr - size + 100),100);
+            temp = @rem((curr - size),100);
+            if (temp < 0) {
+                temp += 100;
+            }
         },
         Dir.right => {
             temp = @rem((curr + size),100);
@@ -43,6 +50,27 @@ pub fn rotate(curr: i32, dir: Dir, size: i32) i32 {
         Dir.end => {}
     }
     return temp;
+}
+
+pub fn rotate2(curr: i32, dir: Dir, size: i32) struct{i32, i32} {
+    var temp: i32 = 0;
+    var count: i32 = 0;
+    //std.debug.print("Curr: {d}, dir: {s}, size: {d}\n", .{curr, @tagName(dir), size});
+    switch (dir) {
+        Dir.left => {
+            count = @divFloor((curr - size), 100);
+            if (count < 0) { count = -count; }
+            temp = @rem((curr - size),100);
+            if (temp < 0) { temp += 100; }
+        },
+        Dir.right => {
+            count = @divFloor((size + curr), 100);
+            temp = @rem((curr + size),100);
+        },
+        Dir.end => {}
+    }
+    //std.debug.print("Count: {d}, pos: {d}\n", .{count, temp});
+    return .{count, temp};
 }
 
 pub fn read(path: []const u8) ![]Op {
@@ -55,7 +83,6 @@ pub fn read(path: []const u8) ![]Op {
     const reader = &fileReader.interface;
     var i: usize = 0;
     while (reader.takeDelimiterExclusive('\n')) |line| {
-        //std.debug.print("{s}, len: {d}\n", .{line, line.len});
         const dir: Dir = switch(line[0]) {
             'L' => Dir.left,
             'R' => Dir.right,
