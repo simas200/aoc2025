@@ -55,21 +55,22 @@ pub fn rotate(curr: i32, dir: Dir, size: i32) i32 {
 pub fn rotate2(curr: i32, dir: Dir, size: i32) struct{i32, i32} {
     var temp: i32 = 0;
     var count: i32 = 0;
-    //std.debug.print("Curr: {d}, dir: {s}, size: {d}\n", .{curr, @tagName(dir), size});
+    if (dir == Dir.right) { std.debug.print("Curr: {d}, dir: {s}, size: {d}\n", .{curr, @tagName(dir), size}); }
     switch (dir) {
         Dir.left => {
-            count = @divFloor((curr - size), 100);
+            count = @divTrunc((curr - size), 100);
             if (count < 0) { count = -count; }
             temp = @rem((curr - size),100);
             if (temp < 0) { temp += 100; }
+            if ((curr - size) <= 0 ) { count += 1; }
         },
         Dir.right => {
-            count = @divFloor((size + curr), 100);
+            count = @divTrunc((size + curr), 100);
             temp = @rem((curr + size),100);
         },
         Dir.end => {}
     }
-    //std.debug.print("Count: {d}, pos: {d}\n", .{count, temp});
+    if (dir == Dir.right) { std.debug.print("Count: {d}, pos: {d}\n", .{count, temp});}
     return .{count, temp};
 }
 
